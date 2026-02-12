@@ -11,7 +11,6 @@ import { aboutData } from "./data/about.js";
 import { controlsHint } from "./data/controlsHint.js";
 import { CAMERA_START, CAMERA_FINAL, TARGET_FINAL } from "./utils/variables.js";
 
-
 // dom target elements
 const canvas = document.querySelector("canvas");
 
@@ -366,7 +365,7 @@ function animateByState(mesh) {
       });
     }
 
-    // MOVE ONLY 
+    // MOVE ONLY
     if (type === ANIMATION_TYPES.MOVE_ONLY) {
       const offset = mesh.userData.moveOffset;
 
@@ -380,7 +379,7 @@ function animateByState(mesh) {
     }
   }
 
-  // IDLE 
+  // IDLE
   if (mesh.userData.state === "idle") {
     if (
       type === ANIMATION_TYPES.SCALE_ONLY ||
@@ -749,19 +748,33 @@ enterBtn.addEventListener("pointerdown", () => {
     ease: "power2.out",
   });
 
-  popSound.volume = 0.45;
-  popSound.currentTime = 0;
-  popSound.play();
-
+  // ---- BGM FIRST (this matters) ----
+  bgm.pause();
   bgm.currentTime = 0;
-  bgm.volume = 0.05;
-  bgm.play();
+  bgm.volume = 0.05; 
+  bgm.muted = false;
 
-  gsap.to(bgm, {
-    volume: 0.45,
-    duration: 2.5,
-    ease: "power1.out",
-  });
+  bgm
+    .play()
+    .then(() => {
+      // fade up 
+      gsap.to(bgm, {
+        volume: 0.25,
+        duration: 2.5,
+        ease: "power1.out",
+      });
+    })
+    .catch((err) => {
+      console.log("BGM blocked:", err);
+    });
+
+  // ---- UI SOUND SECOND ----
+  popSound.pause();
+  popSound.currentTime = 0;
+  popSound.volume = 0.25;
+
+  popSound.play().catch(() => {});
+
   enterScreen.style.display = "none";
   soundToggle.style.display = "block";
   playOpeningIntro();
