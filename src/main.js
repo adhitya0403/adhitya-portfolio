@@ -463,7 +463,7 @@ function playOpeningIntro() {
   controls.maxDistance = preset.maxDist;
   controls.update();
 
-  const CAMERA_DURATION = 3;
+  const CAMERA_DURATION = 4.5;
   const BUILD_START_DELAY = 0.2;
 
   gsap.to(camera.position, {
