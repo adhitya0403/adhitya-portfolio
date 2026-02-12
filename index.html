@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link href="/src/style.scss" rel="stylesheet" />
+    <title>Adhitya — Interactive Web Experiences</title>
+  </head>
+  <body>
+    <canvas></canvas>
+
+    <div class="loader">
+      <p>Loading…</p>
+      <div class="controls-hint"></div>
+    </div>
+
+    <button class="sound-toggle" aria-label="Toggle sound">
+      <img
+        src="./icons/volume.svg"
+        alt="Sound on"
+        class="sound-icon sound-on"
+      />
+      <img
+        src="./icons/volume-x.svg"
+        alt="Sound off"
+        class="sound-icon sound-off"
+      />
+    </button>
+
+    <div class="enter-screen">
+      <button class="enter-button">Enter</button>
+      <div class="controls-hint"></div>
+    </div>
+
+    <div class="modal work">
+      <div class="work-card">
+        <button class="modal-exit">×</button>
+        <h1 class="modal-title">~ My Work ~</h1>
+
+        <div class="modal-tabs">
+          <button class="tab active" data-panel="projects">Projects</button>
+          <button class="tab" data-panel="tech">Tech Stack</button>
+          <button class="tab" data-panel="achievements">Achievements</button>
+        </div>
+
+        <div class="work-content">
+          <div class="project-panel"></div>
+          <div class="tech-panel"></div>
+          <div class="achievements-panel"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal about">
+      <div class="about-card">
+        <button class="modal-exit">×</button>
+
+        <h1 class="modal-title">~ About me ~</h1>
+
+        <div class="about-content"></div>
+      </div>
+    </div>
+
+    <div class="modal contact">
+      <div class="contact-card">
+        <button class="modal-exit">×</button>
+        <h1 class="modal-title">~ Hello there ~</h1>
+        <div class="contact-content">
+          <p>
+            If something here caught your interest<br />
+            I’d be happy to talk.<br />
+            Let’s connect.
+          </p>
+          <div class="links">
+            <img src="./icons/gmail.png" alt="Gmail" data-contact="gmail" />
+            <img
+              src="./icons/linkedin.png"
+              alt="LinkedIn"
+              data-contact="linkedin"
+            />
+            <img src="./icons/github.png" alt="GitHub" data-contact="github" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio id="bgm" src="/sounds/bgm.ogg" loop></audio>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

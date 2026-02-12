@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
+// Colors
+$color-primary: #c0dbeb;
+$color-secondary: #0a4185;
+$color-accent: #6bac59;
+$color-inactive: #cdc7c0;
+$color-bg: #0b213a;
+
+
+
+// Fonts
+$font-primary:
+  "Ubuntu",
+  system-ui,
+  -apple-system,
+  BlinkMacSystemFont,
+  sans-serif;
+
+// font sizes
+$h1-size: 2rem;
+$h2-size: 1.4rem;
+$p-size: 1.1rem;
+
+// font weights
+$h1-weight: 900;
+$h2-weight: 800;
+$p-weight: 600;
