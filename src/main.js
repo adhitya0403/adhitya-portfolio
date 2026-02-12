@@ -753,7 +753,7 @@ enterBtn.addEventListener("click", () => {
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load("/sounds/keyStroke.wav", (buffer) => {
       keyClickSound.setBuffer(buffer);
-      keyClickSound.setVolume(0.35);
+      keyClickSound.setVolume(0.75);
     });
   }
 
@@ -767,7 +767,7 @@ enterBtn.addEventListener("click", () => {
     .play()
     .then(() => {
       gsap.to(bgm, {
-        volume: 0.25,
+        volume: 0.5,
         duration: 2.5,
         ease: "power1.out",
       });
@@ -779,7 +779,7 @@ enterBtn.addEventListener("click", () => {
   // ---- UI POP SOUND ----
   popSound.pause();
   popSound.currentTime = 0;
-  popSound.volume = 0.25;
+  popSound.volume = 0.75;
   popSound.play().catch(() => {});
 
   // UI state
