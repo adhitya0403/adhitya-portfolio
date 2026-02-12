@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from "./utils/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import gsap from "gsap";
@@ -220,14 +220,6 @@ let lastHovered = null;
 let listener = null;
 let keyClickSound = null;
 
-const PAN_LIMITS = {
-  minX: -2,
-  maxX: 2,
-  minZ: -4,
-  maxZ: 4,
-  minY: 1,
-  maxY: 6,
-};
 
 const ANIMATION_TYPES = {
   SCALE_ONLY: "scale_only",
@@ -336,7 +328,6 @@ function animateByState(mesh) {
   if (!base || !type) return;
 
   // hard stop previous tweens
-  gsap.killTweensOf(mesh.scale);
   gsap.killTweensOf(mesh.rotation);
   gsap.killTweensOf(mesh.position);
 
@@ -349,6 +340,7 @@ function animateByState(mesh) {
         z: base.scale.z * 1.2,
         duration: 0.22,
         ease: "power3.out",
+        overwrite: "auto",
       });
     }
 
@@ -360,6 +352,7 @@ function animateByState(mesh) {
         z: base.scale.z * 1.2,
         duration: 0.22,
         ease: "power3.out",
+        overwrite: "auto",
       });
 
       gsap.to(mesh.rotation, {
@@ -393,8 +386,9 @@ function animateByState(mesh) {
         x: base.scale.x,
         y: base.scale.y,
         z: base.scale.z,
-        duration: 0.25,
+        duration: 0.18,
         ease: "power3.out",
+        overwrite: "auto",
       });
     }
 
@@ -421,14 +415,18 @@ function animateByState(mesh) {
 function pressKey(mesh) {
   mesh.userData.state = "pressed";
 
-  gsap.killTweensOf(mesh.position);
+  const base = mesh.userData.base;
 
-  gsap.to(mesh.position, {
-    y: mesh.userData.base.position.y - 0.02,
+  // kill only Y-scale tweens
+  gsap.killTweensOf(mesh.scale);
+
+  gsap.to(mesh.scale, {
+    y: base.scale.y * 0.5, // press depth
     duration: 0.08,
     ease: "power2.in",
     yoyo: true,
     repeat: 1,
+    overwrite: "auto",
     onComplete: () => {
       mesh.userData.state = "idle";
       animateByState(mesh);
@@ -448,10 +446,7 @@ function prepareTargetsForBuild() {
     const base = mesh.userData.build;
     if (!base) return;
 
-    mesh.position.copy(base.position);
-    mesh.scale.copy(base.scale);
-
-    mesh.scale.multiplyScalar(0.001);
+    mesh.scale.copy(mesh.userData.build.scale).multiplyScalar(0.001);
   });
 }
 
@@ -576,10 +571,10 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.minDistance = 3;
 
 // pan controls
-controls.panSpeed = 0.8;
+controls.panSpeed = 0.4;
 
 //speeds
-controls.rotateSpeed = 0.8;
+controls.rotateSpeed = 0.4;
 controls.zoomSpeed = 0.8;
 
 // loaders
@@ -682,7 +677,10 @@ gltfLoader.load("/models/Room_Portfolio.glb", (gltf) => {
       mesh.userData.animationType = ANIMATION_TYPES.SCALE_ROTATE;
     }
 
-    if (mesh.name.includes("hover_1") || mesh.name.includes("click")) {
+    if (
+      mesh.name.includes("hover_1") ||
+      (mesh.name.includes("click") && !mesh.name.toLowerCase().includes("key"))
+    ) {
       animateObjects.push(mesh);
       // store build base
       mesh.userData.build = {
@@ -804,14 +802,6 @@ window.addEventListener("resize", () => {
   applyCameraPresets();
 });
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "p") {
-    console.log("Camera position:", camera.position.clone());
-    console.log("Controls target:", controls.target.clone());
-    console.log("width", window.innerWidth);
-    console.log("width", window.innerHeight);
-  }
-});
 
 window.addEventListener("pointerup", () => {
   if (isModalOpen) return;
@@ -849,25 +839,26 @@ window.addEventListener("pointermove", (event) => {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 });
 
-controls.addEventListener("change", () => {
-  controls.target.x = THREE.MathUtils.clamp(
-    controls.target.x,
-    PAN_LIMITS.minX,
-    PAN_LIMITS.maxX,
-  );
+// controls.addEventListener("end", () => {
+//   console.log("hello WTH")
+//   controls.target.x = THREE.MathUtils.clamp(
+//     controls.target.x,
+//     PAN_LIMITS.minX,
+//     PAN_LIMITS.maxX
+//   );
+//   controls.target.y = THREE.MathUtils.clamp(
+//     controls.target.y,
+//     PAN_LIMITS.minY,
+//     PAN_LIMITS.maxY
+//   );
+//   controls.target.z = THREE.MathUtils.clamp(
+//     controls.target.z,
+//     PAN_LIMITS.minZ,
+//     PAN_LIMITS.maxZ
+//   );
+// });
 
-  controls.target.y = THREE.MathUtils.clamp(
-    controls.target.y,
-    PAN_LIMITS.minY,
-    PAN_LIMITS.maxY,
-  );
 
-  controls.target.z = THREE.MathUtils.clamp(
-    controls.target.z,
-    PAN_LIMITS.minZ,
-    PAN_LIMITS.maxZ,
-  );
-});
 
 soundToggle.addEventListener("pointerdown", () => {
   isMuted = !isMuted;
