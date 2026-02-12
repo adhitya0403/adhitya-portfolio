@@ -217,6 +217,9 @@ const animateObjects = [];
 let currentTargets = [];
 let isModalOpen = false;
 let lastHovered = null;
+let listener = null;
+let keyClickSound = null;
+
 
 const PAN_LIMITS = {
   minX: -2,
@@ -594,18 +597,7 @@ function loadBakedTexture(path) {
   return tex;
 }
 
-//audio loader
-const listener = new THREE.AudioListener();
-camera.add(listener);
 
-const audioLoader = new THREE.AudioLoader();
-
-const keyClickSound = new THREE.Audio(listener);
-
-audioLoader.load("/sounds/keyStroke.wav", (buffer) => {
-  keyClickSound.setBuffer(buffer);
-  keyClickSound.setVolume(0.35); // tune later
-});
 
 // textures
 const textureSets = [
@@ -737,9 +729,10 @@ enterBtn.addEventListener("pointerleave", () => {
   enterShake.play();
 });
 
-enterBtn.addEventListener("pointerdown", () => {
+enterBtn.addEventListener("click", () => {
   enterShake.kill();
 
+  // button feedback
   gsap.to(enterBtn, {
     scale: 0.95,
     duration: 0.08,
@@ -748,37 +741,51 @@ enterBtn.addEventListener("pointerdown", () => {
     ease: "power2.out",
   });
 
-  // ---- BGM FIRST (this matters) ----
+  
+  if (!listener) {
+    listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    keyClickSound = new THREE.Audio(listener);
+
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load("/sounds/keyStroke.wav", (buffer) => {
+      keyClickSound.setBuffer(buffer);
+      keyClickSound.setVolume(0.35);
+    });
+  }
+
+  // ---- START BGM (HTML audio) ----
   bgm.pause();
   bgm.currentTime = 0;
   bgm.volume = 0.05; 
   bgm.muted = false;
 
-  bgm
-    .play()
+  bgm.play()
     .then(() => {
-      // fade up 
       gsap.to(bgm, {
         volume: 0.25,
         duration: 2.5,
         ease: "power1.out",
       });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log("BGM blocked:", err);
     });
 
-  // ---- UI SOUND SECOND ----
+  // ---- UI POP SOUND ----
   popSound.pause();
   popSound.currentTime = 0;
   popSound.volume = 0.25;
-
   popSound.play().catch(() => {});
 
+  // UI state
   enterScreen.style.display = "none";
   soundToggle.style.display = "block";
-  playOpeningIntro();
+
+  playOpeningIntro(); 
 });
+
 
 const mode = getControlsHint();
 hint.forEach((hint) => {
@@ -838,13 +845,6 @@ window.addEventListener("pointermove", (event) => {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 });
 
-window.addEventListener(
-  "pointerdown",
-  () => {
-    listener.context.resume();
-  },
-  { once: true },
-);
 
 controls.addEventListener("change", () => {
   controls.target.x = THREE.MathUtils.clamp(
