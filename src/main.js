@@ -220,7 +220,6 @@ let lastHovered = null;
 let listener = null;
 let keyClickSound = null;
 
-
 const PAN_LIMITS = {
   minX: -2,
   maxX: 2,
@@ -329,6 +328,8 @@ function getCameraPreset() {
 }
 
 function animateByState(mesh) {
+  if (mesh.userData.state === "pressed") return;
+
   const base = mesh.userData.base;
   const type = mesh.userData.animationType;
 
@@ -418,6 +419,8 @@ function animateByState(mesh) {
 }
 
 function pressKey(mesh) {
+  mesh.userData.state = "pressed";
+
   gsap.killTweensOf(mesh.position);
 
   gsap.to(mesh.position, {
@@ -426,6 +429,10 @@ function pressKey(mesh) {
     ease: "power2.in",
     yoyo: true,
     repeat: 1,
+    onComplete: () => {
+      mesh.userData.state = "idle";
+      animateByState(mesh);
+    },
   });
 }
 
@@ -597,8 +604,6 @@ function loadBakedTexture(path) {
   return tex;
 }
 
-
-
 // textures
 const textureSets = [
   { match: "first", texture: loadBakedTexture("/textures/first_set.webp") },
@@ -741,7 +746,6 @@ enterBtn.addEventListener("click", () => {
     ease: "power2.out",
   });
 
-  
   if (!listener) {
     listener = new THREE.AudioListener();
     camera.add(listener);
@@ -758,10 +762,11 @@ enterBtn.addEventListener("click", () => {
   // ---- START BGM (HTML audio) ----
   bgm.pause();
   bgm.currentTime = 0;
-  bgm.volume = 0.05; 
+  bgm.volume = 0.05;
   bgm.muted = false;
 
-  bgm.play()
+  bgm
+    .play()
     .then(() => {
       gsap.to(bgm, {
         volume: 0.25,
@@ -769,7 +774,7 @@ enterBtn.addEventListener("click", () => {
         ease: "power1.out",
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("BGM blocked:", err);
     });
 
@@ -783,9 +788,8 @@ enterBtn.addEventListener("click", () => {
   enterScreen.style.display = "none";
   soundToggle.style.display = "block";
 
-  playOpeningIntro(); 
+  playOpeningIntro();
 });
-
 
 const mode = getControlsHint();
 hint.forEach((hint) => {
@@ -844,7 +848,6 @@ window.addEventListener("pointermove", (event) => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 });
-
 
 controls.addEventListener("change", () => {
   controls.target.x = THREE.MathUtils.clamp(
